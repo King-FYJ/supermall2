@@ -28,7 +28,7 @@
 <style scoped>
 
     .goods-list-item {
-        width: 49%;
+        width: 45%;
         height: auto;
         padding-top: 6px;
         font-size: 14px;
