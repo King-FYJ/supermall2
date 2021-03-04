@@ -25,9 +25,11 @@
 
 <style scoped>
  .goods{
+     /*background-color: #f1f0f0;*/
      display: flex;
      flex-wrap: wrap;
-     align-content: space-evenly;
+     align-content: space-between;
      justify-content: space-evenly;
  }
+
 </style>

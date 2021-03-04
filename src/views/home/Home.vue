@@ -3,15 +3,22 @@
         <nav-bar class="home-nav">
             <div slot="center">购物街</div>
         </nav-bar>
+        <tab-control :titles="['流行','新款','精选']"
+                     @tabClick="tabClick"
+                     ref="tabControl1"
+                     class="tab-control"
+                     v-show="isTabFixed"></tab-control>
         <scroll class="content" ref="scroll"
                 :probe-type="3"
                 @scroll="contentScroll"
                 :pull-up-load="true"
                 @pullingUp="loadMore">
-            <home-swiper :banners="banners"/>
+            <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
             <recommend-view :recommends="recommends"/>
             <feature-view></feature-view>
-            <tab-control :titles="['流行','新款','精选']" class="tab-control" @tabClick="tabClick"></tab-control>
+            <tab-control :titles="['流行','新款','精选']"
+                         @tabClick="tabClick"
+                         ref="tabControl2"></tab-control>
             <good-list :goods="showGoods"></good-list>
         </scroll>
         <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
@@ -56,7 +63,10 @@
                     'sell': {page: 0, list: []}
                 },
                 currentType: 'pop',
-                isShowBackTop: false
+                isShowBackTop: false,
+                tabOffsetTop: 0,
+                isTabFixed: false,
+                saveY: 0
             }
         },
         created() {
@@ -66,10 +76,25 @@
             this.getHomeGoods('new')
             this.getHomeGoods('sell')
         },
+        destroyed() {
+            console.log('666');
+        },
+        mounted() {
+            // 获取tabcontrol的offsettop  所有的组件都有一个属性$el，用于获取组件中的元素
+            // console.log(this.$refs.tabControl.$el.offsetTop);
+        },
         computed: {
             showGoods() {
                 return this.goods[this.currentType].list
-            }
+            },
+
+        },
+        activated() {
+            this.$refs.scroll.scrollTo(0, this.saveY, 0)
+            this.$refs.scroll.refresh()
+        },
+        deactivated() {
+            this.saveY = this.$refs.scroll.getScrollY()
         },
         methods: {
             //事件监听
@@ -84,6 +109,8 @@
                     case 2:
                         this.currentType = 'sell'
                 }
+                this.$refs.tabControl1.currentIndex = index;
+                this.$refs.tabControl2.currentIndex = index;
             },
             backClick() {
                 // console.log(this.$refs);
@@ -91,10 +118,16 @@
 
             },
             contentScroll(position) {
+                //判断backtop是否显示
                 this.isShowBackTop = -position.y > 1000
+                //决定tabControl 是否吸顶（position:fixed）
+                this.isTabFixed = (-position.y) > this.tabOffsetTop
             },
-            loadMore(){
+            loadMore() {
                 this.getHomeGoods(this.currentType)
+            },
+            swiperImageLoad() {
+                this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop
             },
 
 
@@ -121,7 +154,7 @@
 </script>
 <style scoped>
     #home {
-        margin-top: 44px;
+        /*margin-top: 44px;*/
         height: 100vh;
         position: relative;
     }
@@ -129,17 +162,18 @@
     .home-nav {
         background-color: var(--color-tint);
         color: #fff;
-        position: fixed;
-        left: 0;
-        right: 0;
-        top: 0;
-        z-index: 9;
+        /*position: fixed;*/
+        /*left: 0;*/
+        /*right: 0;*/
+        /*top: 0;*/
+        /*z-index: 9;*/
     }
 
     .tab-control {
-        position: sticky;
-        top: 44px;
+        position: relative;
+        z-index: 9;
     }
+
 
     .content {
         position: absolute;

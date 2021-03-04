@@ -1,6 +1,6 @@
 <template>
     <div class="goods-list-item">
-        <img :src="goodsItem.show.img" class="goods-list-img">
+        <img :src="goodsItem.show.img" class="goods-list-img" @click="itemClick">
         <div class="goods-list-text">
             <div class="goods-list-name one-txt-cut">{{goodsItem.title}}</div>
             <div class="goods-list-price">
@@ -21,6 +21,11 @@
                     return {}
                 }
             }
+        },
+        methods:{
+            itemClick(){
+                this.$router.push('/detail/'+this.goodsItem.iid)
+            }
         }
     }
 </script>
@@ -39,7 +44,9 @@
         height: auto;
         border-radius: 4px;
     }
-
+.goods-list-name{
+    /*background-color: #000000;*/
+}
     .goods-list-price {
         display: flex;
         justify-content: space-between;
